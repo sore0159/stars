@@ -81,12 +81,14 @@
     for (var k = 0; k <=255; k+=1) {
         ctxList.push("rgb("+k+","+k+","+k+")");
     }
-    function setFill(x) {
-        ctx.fillStyle = ctxList[x];
-    }
     function renderStars(timestamp) {
+        var brightList = [];
+        for (var i = 0; i <=255; i+=1) {
+            brightList.push([]);
+        }
         ctx.clearRect(0,0, canvas.width, canvas.height);
         var theta = 2 * Math.PI * ((timestamp % 500000)/500000);
+
         starList.forEach(function(star) {
             var x = (star.r * Math.cos(theta+star.theta));
             var y = 0.55*(star.r * Math.sin(theta+star.theta));
@@ -99,8 +101,16 @@
             if (rand < 0.125) {
                 star.lastB = 10 + Math.floor( star.b * (0.25 + 6*rand) );
             }
-            setFill(star.lastB);
-            ctx.fillRect(x, y, 1, 1);
+            brightList[star.lastB].push([x,y]);
+        });
+        brightList.forEach(function(coordList, ind) {
+            if (!coordList) {
+                return;
+            }
+            ctx.fillStyle = ctxList[ind];
+            coordList.forEach(function(coord) {
+                ctx.fillRect(coord[0], coord[1], 1, 1);
+            });
         });
     }
     function starLoop(timestamp) {
